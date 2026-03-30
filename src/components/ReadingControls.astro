@@ -1,0 +1,66 @@
+---
+import { READING_FONTS, FONT_SIZES } from '../config';
+---
+
+<div class="reading-controls">
+  <label>
+    Font:
+    <select id="font-select">
+      {READING_FONTS.map((font) => (
+        <option value={font.family}>{font.name}</option>
+      ))}
+    </select>
+  </label>
+  <div class="font-size-controls">
+    <button id="font-size-decrease" type="button" aria-label="Decrease font size">A&minus;</button>
+    <span id="font-size-display"></span>
+    <button id="font-size-increase" type="button" aria-label="Increase font size">A+</button>
+  </div>
+</div>
+
+<script define:vars={{ FONT_SIZES }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const select = document.getElementById('font-select');
+    const decreaseBtn = document.getElementById('font-size-decrease');
+    const increaseBtn = document.getElementById('font-size-increase');
+    const display = document.getElementById('font-size-display');
+    const postBody = document.querySelector('.post-body');
+
+    if (!select || !decreaseBtn || !increaseBtn || !display || !postBody) return;
+
+    const sizes = FONT_SIZES;
+
+    // Restore saved font
+    const savedFont = localStorage.getItem('reading-font');
+    if (savedFont) {
+      select.value = savedFont;
+      postBody.style.fontFamily = savedFont;
+    }
+
+    // Restore saved size
+    let sizeIdx = sizes.indexOf(parseInt(localStorage.getItem('reading-size') || '16', 10));
+    if (sizeIdx === -1) sizeIdx = 0;
+
+    function applySize() {
+      const size = sizes[sizeIdx];
+      postBody.style.fontSize = size + 'px';
+      display.textContent = size + 'px';
+      localStorage.setItem('reading-size', String(size));
+    }
+    applySize();
+
+    select.addEventListener('change', () => {
+      const family = select.value;
+      postBody.style.fontFamily = family;
+      localStorage.setItem('reading-font', family);
+    });
+
+    decreaseBtn.addEventListener('click', () => {
+      if (sizeIdx > 0) { sizeIdx--; applySize(); }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+      if (sizeIdx < sizes.length - 1) { sizeIdx++; applySize(); }
+    });
+  });
+</script>

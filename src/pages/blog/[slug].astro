@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+/*
+ * MDX Component Mapping
+ * To use custom components in MDX files, add them here.
+ * Example:
+ *   import Callout from '../../components/Callout.astro';
+ *   const components = { Callout };
+ * Then in any .mdx file: <Callout>Some note</Callout>
+ */
+const components = {};
+---
+
+<BlogPostLayout title={post.data.title} date={post.data.date} excerpt={post.data.excerpt}>
+  <Content {components} />
+</BlogPostLayout>

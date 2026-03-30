@@ -1,0 +1,73 @@
+---
+---
+
+<div class="theme-toggle">
+  <button id="theme-toggle-btn" type="button" aria-label="Toggle theme">
+    <span class="theme-icon" data-icon="light">&#9788; Light</span>
+    <span class="theme-icon" data-icon="dark">&#9790; Dark</span>
+    <span class="theme-icon" data-icon="reading">&#9998; Reading</span>
+  </button>
+</div>
+
+<style>
+  .theme-toggle {
+    flex-shrink: 0;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    /* Adjust padding and font-size here to make the button bigger/smaller */
+    padding: var(--space-sm) var(--space-md);
+    font-size: 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: var(--color-surface);
+  }
+
+  .theme-icon {
+    display: none;
+  }
+
+  :global([data-theme="light"]) .theme-icon[data-icon="light"] {
+    display: inline;
+  }
+
+  :global([data-theme="dark"]) .theme-icon[data-icon="dark"] {
+    display: inline;
+  }
+
+  :global([data-theme="reading"]) .theme-icon[data-icon="reading"] {
+    display: inline;
+  }
+</style>
+
+<script>
+  const themes = ['light', 'dark', 'reading'] as const;
+
+  function getTheme(): string {
+    return localStorage.getItem('theme') || 'dark';
+  }
+
+  function setTheme(theme: string) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }
+
+  setTheme(getTheme());
+
+  const btn = document.getElementById('theme-toggle-btn');
+  btn?.addEventListener('click', () => {
+    const current = getTheme();
+    const idx = themes.indexOf(current as typeof themes[number]);
+    const next = themes[(idx + 1) % themes.length];
+    setTheme(next);
+  });
+</script>

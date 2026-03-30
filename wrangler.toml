@@ -1,0 +1,5 @@
+name = "tarso-dev"
+compatibility_date = "2026-03-30"
+
+[site]
+bucket = "./dist"

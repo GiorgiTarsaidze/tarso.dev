@@ -1,0 +1,114 @@
+---
+import Footer from '../components/Footer.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import ReadingControls from '../components/ReadingControls.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  date: Date;
+  excerpt: string;
+}
+
+const { title, date, excerpt } = Astro.props;
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={excerpt} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} — Giorgi Tarsaidze</title>
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <div class="blog-toolbar">
+        <nav class="blog-nav">
+          <div class="blog-nav-left">
+            <a href="/" class="back-link">&larr; Blog</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">{title}</span>
+          </div>
+          <ThemeToggle />
+        </nav>
+        <ReadingControls />
+      </div>
+      <main>
+        <article>
+          <div class="post-header">
+            <h1>{title}</h1>
+            <time datetime={date.toISOString()}>{formattedDate}</time>
+          </div>
+          <div class="post-body">
+            <slot />
+          </div>
+        </article>
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>
+
+<style>
+  .blog-toolbar {
+    /* Adjust margin-top to control distance from the top of the page */
+    margin-top: var(--space-xl);
+    padding: var(--space-md) 0 var(--space-md);
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .blog-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .blog-nav-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .back-link {
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .breadcrumb-separator {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .breadcrumb-current {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .breadcrumb-current {
+      display: none;
+    }
+  }
+</style>

@@ -1,17 +1,120 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const projects = await getCollection('projects');
+
+const talks = (await getCollection('talks'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const hackathons = (await getCollection('hackathons'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Giorgi Tarsaidze">
+
+  <!-- Blog -->
+  <section class="section">
+    <h2 class="section-title">Blogs</h2>
+    {allPosts.length === 0 ? (
+      <p style="color: var(--color-text-secondary)">No posts yet. Check back soon!</p>
+    ) : (
+      <ul class="post-list">
+        {allPosts.map((post) => (
+          <li>
+            <a href={`/blog/${post.id}/`} class="post-item-link">
+              {post.data.coverImage && (
+                <img
+                  class="post-thumbnail"
+                  src={post.data.coverImage}
+                  alt={`Cover image for ${post.data.title}`}
+                />
+              )}
+              <div class="post-info">
+                <h3 class="post-title">{post.data.title}</h3>
+                <span class="post-date">
+                  {post.data.date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+                <p class="post-excerpt">{post.data.excerpt}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <!-- Projects -->
+  <section class="section">
+    <h2 class="section-title">Projects</h2>
+    {projects.length === 0 ? (
+      <p style="color: var(--color-text-secondary)">No projects yet. Check back soon!</p>
+    ) : (
+      <ul class="project-list">
+        {projects.map((project) => (
+          <li class="project-item">
+            <a class="project-name" href={project.data.github} target="_blank" rel="noopener noreferrer">
+              {project.data.title}
+            </a>
+            <p class="project-description">{project.data.description}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <!-- Talks & Hackathons — two-column row -->
+  <div class="two-column-row">
+    <section class="section">
+      <h2 class="section-title">Talks</h2>
+      {talks.length === 0 ? (
+        <p style="color: var(--color-text-secondary)">No talks yet.</p>
+      ) : (
+        <ul class="simple-list">
+          {talks.map((talk) => (
+            <li>
+              <strong>
+                {talk.data.link ? (
+                  <a href={talk.data.link} target="_blank" rel="noopener noreferrer">{talk.data.title}</a>
+                ) : (
+                  talk.data.title
+                )}
+              </strong>
+              <span class="list-meta">{talk.data.event} &middot; {talk.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Hackathons & Events</h2>
+      {hackathons.length === 0 ? (
+        <p style="color: var(--color-text-secondary)">No events yet.</p>
+      ) : (
+        <ul class="simple-list">
+          {hackathons.map((hack) => (
+            <li>
+              <strong>
+                {hack.data.link ? (
+                  <a href={hack.data.link} target="_blank" rel="noopener noreferrer">{hack.data.title}</a>
+                ) : (
+                  hack.data.title
+                )}
+              </strong>
+              <span class="list-meta">{hack.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} &middot; {hack.data.description}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </div>
+
+</BaseLayout>
