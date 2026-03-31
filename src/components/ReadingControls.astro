@@ -1,5 +1,5 @@
 ---
-import { READING_FONTS, FONT_SIZES } from '../config';
+import { READING_FONTS, FONT_SIZES, LINE_HEIGHTS } from '../config';
 ---
 
 <div class="reading-controls">
@@ -16,19 +16,29 @@ import { READING_FONTS, FONT_SIZES } from '../config';
     <span id="font-size-display"></span>
     <button id="font-size-increase" type="button" aria-label="Increase font size">A+</button>
   </div>
+  <div class="font-size-controls">
+    <button id="spacing-decrease" type="button" aria-label="Decrease line spacing">&#9776;&minus;</button>
+    <span id="spacing-display"></span>
+    <button id="spacing-increase" type="button" aria-label="Increase line spacing">&#9776;+</button>
+  </div>
 </div>
 
-<script define:vars={{ FONT_SIZES }}>
+<script define:vars={{ FONT_SIZES, LINE_HEIGHTS }}>
   document.addEventListener('DOMContentLoaded', () => {
     const select = document.getElementById('font-select');
     const decreaseBtn = document.getElementById('font-size-decrease');
     const increaseBtn = document.getElementById('font-size-increase');
     const display = document.getElementById('font-size-display');
+    const spacingDecrease = document.getElementById('spacing-decrease');
+    const spacingIncrease = document.getElementById('spacing-increase');
+    const spacingDisplay = document.getElementById('spacing-display');
     const postBody = document.querySelector('.post-body');
 
     if (!select || !decreaseBtn || !increaseBtn || !display || !postBody) return;
+    if (!spacingDecrease || !spacingIncrease || !spacingDisplay) return;
 
     const sizes = FONT_SIZES;
+    const spacings = LINE_HEIGHTS;
 
     // Restore saved font
     const savedFont = localStorage.getItem('reading-font');
@@ -49,6 +59,18 @@ import { READING_FONTS, FONT_SIZES } from '../config';
     }
     applySize();
 
+    // Restore saved line height
+    let spacingIdx = spacings.indexOf(parseFloat(localStorage.getItem('reading-spacing') || '1.8'));
+    if (spacingIdx === -1) spacingIdx = 2; // default to 1.8
+
+    function applySpacing() {
+      const spacing = spacings[spacingIdx];
+      postBody.style.lineHeight = String(spacing);
+      spacingDisplay.textContent = spacing.toFixed(1);
+      localStorage.setItem('reading-spacing', String(spacing));
+    }
+    applySpacing();
+
     select.addEventListener('change', () => {
       const family = select.value;
       postBody.style.fontFamily = family;
@@ -61,6 +83,14 @@ import { READING_FONTS, FONT_SIZES } from '../config';
 
     increaseBtn.addEventListener('click', () => {
       if (sizeIdx < sizes.length - 1) { sizeIdx++; applySize(); }
+    });
+
+    spacingDecrease.addEventListener('click', () => {
+      if (spacingIdx > 0) { spacingIdx--; applySpacing(); }
+    });
+
+    spacingIncrease.addEventListener('click', () => {
+      if (spacingIdx < spacings.length - 1) { spacingIdx++; applySpacing(); }
     });
   });
 </script>
