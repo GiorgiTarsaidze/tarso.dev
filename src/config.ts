@@ -11,7 +11,7 @@ export const SOCIAL = {
   github: 'https://github.com/GiorgiTarsaidze',
   email: 'mailto:tarsaidzeg@gmail.com',
   youtube: 'https://www.youtube.com/@codequestwithtarso',
-  twitter: 'https://x.com/tarso125',
+  twitter: 'https://x.com/tarsocode',
 };
 
 /**
