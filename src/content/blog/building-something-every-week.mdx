@@ -1,0 +1,34 @@
+---
+title: "Building something every week"
+date: 2026-07-18
+excerpt: "Starting this week, I'm shipping one real build a week in public. First one is already out: pdfcomet.com, a free serverless document conversion tool."
+coverImage: ""
+draft: false
+---
+
+I've recently fallen in love with building and shipping ideas in a few days. With
+the help of my orange friend, everything in this era feels fast and a little
+confusing — but I think I've found a track I can actually follow.
+
+Starting this week, I'm doing that in public. One real build a week. I also want
+to give a shoutout to John Crickett, whose challenges are what first got me
+hooked on building this kind of thing. Some weeks I'll rebuild systems that
+already exist, mostly for practice. Other weeks I'll finally ship ideas I've
+been sitting on for a while.
+
+First one is already out: pdfcomet.com, a free document conversion tool. No
+signup, no watermark, no catch on the free tier. I built it solo, in a few days.
+It's live, but almost nobody knows it exists yet, right now I'm working on its
+traffic and SEO.
+
+It's a simple product, hundreds of similar tools already exist, but I wanted
+to try building the architecture myself and see how something like this
+actually gets put together end to end. The backend is fully serverless on AWS:
+a static frontend on CloudFront, files go from the browser to S3, and
+an async Lambda pipeline converts the file, validates it, and writes the result
+back to S3. No queues, no servers to manage. Everything, input and output, gets
+deleted automatically within about 20 minutes.
+
+I'll write here each week about what I built, what worked, and what didn't.
+Follow along on [X](https://x.com/tarsocode) for the day-to-day, and I'll post
+the fuller stories here.
