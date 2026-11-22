@@ -19,6 +19,13 @@ const projects = defineCollection({
     link: z.string().url(),
     description: z.string(),
     order: z.number(),
+    section: z.enum(['venture', 'open-source', 'hackathon']),
+    featured: z.boolean().default(false),
+    role: z.string().optional(),
+    status: z.string().optional(),
+    /** "owner/name" on GitHub; its stars, forks and language are fetched at build time */
+    repo: z.string().optional(),
+    metrics: z.array(z.object({ value: z.string(), label: z.string() })).default([]),
   }),
 });
 

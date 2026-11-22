@@ -1,6 +1,9 @@
 ---
 title: "binadar"
 link: "https://binadar.ge"
-description: "Real estate aggregator for Georgia. Watches listings across major Tbilisi and Batumi property sites and sends notifications when a new one matches your saved filter."
-order: 2
+description: "Listing alerts for Georgian real estate agents. Define a client's brief once instead of checking three property sites every day. Engine and trilingual web app built, priced as a monthly subscription."
+section: "venture"
+role: "Tarsai Systems"
+status: "On hold"
+order: 3
 ---

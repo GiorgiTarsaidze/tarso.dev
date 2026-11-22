@@ -2,7 +2,7 @@
 
 export const SITE = {
   name: 'Giorgi Tarsaidze',
-  description: 'Software Engineer',
+  description: 'Software & AI Engineer, Product Builder · Founder, Tarsai Systems',
   url: 'https://tarso.dev',
 };
 
@@ -12,6 +12,7 @@ export const SOCIAL = {
   email: 'mailto:tarsaidzeg@gmail.com',
   youtube: 'https://www.youtube.com/@codequestwithtarso',
   twitter: 'https://x.com/tarsoquest',
+  instagram: 'https://www.instagram.com/tarsodev/',
 };
 
 /**
