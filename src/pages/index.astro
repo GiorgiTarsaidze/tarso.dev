@@ -1,12 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import RepoCard from '../components/RepoCard.astro';
 import { getCollection } from 'astro:content';
-
-const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const projects = (await getCollection('projects'))
   .sort((a, b) => a.data.order - b.data.order);
+const inSection = (section: string) => projects.filter((p) => p.data.section === section);
+
+const ventures = inSection('venture');
+const openSource = inSection('open-source');
+const hackathonBuilds = inSection('hackathon');
 
 const talks = (await getCollection('talks'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -17,58 +21,35 @@ const hackathons = (await getCollection('hackathons'))
 
 <BaseLayout title="Giorgi Tarsaidze">
 
-  <!-- Blog -->
+  <!-- Ventures -->
   <section class="section">
-    <h2 class="section-title">Blogs</h2>
-    {allPosts.length === 0 ? (
-      <p style="color: var(--color-text-secondary)">No posts yet. Check back soon!</p>
-    ) : (
-      <ul class="post-list">
-        {allPosts.map((post) => (
-          <li>
-            <a href={`/blog/${post.id}/`} class="post-item-link">
-              {post.data.coverImage && (
-                <img
-                  class="post-thumbnail"
-                  src={post.data.coverImage}
-                  alt={`Cover image for ${post.data.title}`}
-                />
-              )}
-              <div class="post-info">
-                <h3 class="post-title">{post.data.title}</h3>
-                <span class="post-date">
-                  {post.data.date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </span>
-                <p class="post-excerpt">{post.data.excerpt}</p>
-              </div>
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
+    <h2 class="section-title">Ventures</h2>
+    <div class="card-grid">
+      {ventures.map((p) => <ProjectCard project={p} />)}
+    </div>
   </section>
 
-  <!-- Projects -->
+  <!-- Open source -->
   <section class="section">
-    <h2 class="section-title">Projects</h2>
-    {projects.length === 0 ? (
-      <p style="color: var(--color-text-secondary)">No projects yet. Check back soon!</p>
-    ) : (
-      <ul class="project-list">
-        {projects.map((project) => (
-          <li class="project-item">
-            <a class="project-name" href={project.data.link} target="_blank" rel="noopener noreferrer">
-              {project.data.title}
-            </a>
-            <p class="project-description">{project.data.description}</p>
-          </li>
-        ))}
-      </ul>
-    )}
+    <h2 class="section-title">Open source</h2>
+    <div class="card-grid card-grid-3">
+      {openSource.map((p) => <RepoCard project={p} />)}
+    </div>
+  </section>
+
+  <!-- Hackathon builds -->
+  <section class="section">
+    <h2 class="section-title">Hackathon builds</h2>
+    <ul class="project-list">
+      {hackathonBuilds.map((project) => (
+        <li class="project-item">
+          <a class="project-name" href={project.data.link} target="_blank" rel="noopener noreferrer">
+            {project.data.title}
+          </a>
+          <p class="project-description">{project.data.description}</p>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <!-- Talks & Hackathons — two-column row -->

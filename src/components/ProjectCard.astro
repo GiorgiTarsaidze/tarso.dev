@@ -1,0 +1,162 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, link, description, role, status, metrics, featured } = project.data;
+const { Content } = await render(project);
+const host = new URL(link).host.replace(/^www\./, '');
+---
+
+<article class:list={['card', { 'card-featured': featured }]}>
+  <header class="card-head">
+    <a class="card-title" href={link} target="_blank" rel="noopener noreferrer">{title} <span aria-hidden="true">↗</span></a>
+    {status && <span class:list={['card-status', { live: status.startsWith('Live') }]}>{status}</span>}
+  </header>
+  <p class="card-meta">{role ? `${role} · ` : ''}{host}</p>
+  <p class="card-description">{description}</p>
+
+  {metrics.length > 0 && (
+    <dl class="card-metrics">
+      {metrics.map((m) => (
+        <div class="metric">
+          <dt>{m.label}</dt>
+          <dd>{m.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+
+  {project.body?.trim() && <div class="card-body"><Content /></div>}
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+  }
+
+  .card-featured {
+    grid-column: 1 / -1;
+    padding: var(--space-lg);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-right: auto;
+  }
+
+  .card-featured .card-title {
+    font-size: 1.4rem;
+  }
+
+  .card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    padding: 0.05rem 0.55rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .card-status.live::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-live);
+  }
+
+  .card-meta {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-top: -0.35rem;
+  }
+
+  .card-description {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .card-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+  }
+
+  .metric {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 6px;
+    background: var(--color-bg);
+  }
+
+  .metric dd {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .metric dt {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    line-height: 1.3;
+  }
+
+  .card-body :global(ul) {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+  }
+
+  .card-body :global(li) {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  .card-body :global(li)::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+  }
+
+  .card-body :global(strong) {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .card-featured {
+      padding: var(--space-md);
+    }
+  }
+</style>

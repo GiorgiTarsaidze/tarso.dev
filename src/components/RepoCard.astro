@@ -1,0 +1,127 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, link, description, repo } = project.data;
+
+// GitHub's language colours for the languages these repos use.
+const LANGUAGE_COLORS: Record<string, string> = {
+  Rust: '#dea584',
+  JavaScript: '#f1e05a',
+  TypeScript: '#3178c6',
+  Python: '#3572a5',
+};
+
+// Live repo stats at build time; a failed request hides the stats row.
+let stats: { stars: number; forks: number; language: string | null } | null = null;
+if (repo) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}`);
+    if (res.ok) {
+      const data = await res.json();
+      stats = { stars: data.stargazers_count, forks: data.forks_count, language: data.language };
+    }
+  } catch {}
+}
+---
+
+<a class="repo" href={link} target="_blank" rel="noopener noreferrer">
+  <div class="repo-head">
+    <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+    <span class="repo-name">{title}</span>
+  </div>
+
+  <p class="repo-description">{description}</p>
+
+  {stats && (
+    <div class="repo-stats">
+      {stats.language && (
+        <span class="repo-stat">
+          <span class="lang-dot" style={`background:${LANGUAGE_COLORS[stats.language] ?? 'var(--color-text-secondary)'}`}></span>
+          {stats.language}
+        </span>
+      )}
+      <span class="repo-stat" title="Stars">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+        {stats.stars}
+      </span>
+      <span class="repo-stat" title="Forks">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+        {stats.forks}
+      </span>
+    </div>
+  )}
+</a>
+
+<style>
+  .repo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .repo:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+
+  .repo-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .repo-icon {
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .repo-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+
+  .repo-description {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  .repo-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: auto;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+
+  .repo-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .lang-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+  }
+</style>
