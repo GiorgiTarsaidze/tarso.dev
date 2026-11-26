@@ -1,0 +1,77 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { repoStats } from '../lib/github';
+
+interface Props {
+  app: CollectionEntry<'projects'>;
+}
+
+const { app } = Astro.props;
+const { title, link, description, repo } = app.data;
+const stats = await repoStats(repo);
+---
+
+<a class="app" href={link} target="_blank" rel="noopener noreferrer">
+  <img class="app-icon" src={`/apps/${app.id}.svg`} alt="" width="104" height="104" />
+  <span class="app-name">{title}</span>
+  <span class="app-desc">{description}</span>
+  {stats && (
+    <span class="app-meta">
+      <span>★ {stats.stars}</span>
+      {stats.language && <span>{stats.language}</span>}
+    </span>
+  )}
+</a>
+
+<style>
+  .app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+    color: var(--color-text);
+  }
+
+  .app:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .app-icon {
+    width: 104px;
+    height: 104px;
+    margin-bottom: var(--space-sm);
+    border-radius: 16%;
+    box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.55);
+    transition: transform 0.15s ease;
+  }
+
+  .app:hover .app-icon {
+    transform: translateY(-4px);
+  }
+
+  .app-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .app-desc {
+    max-width: 32ch;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+
+  .app-meta {
+    display: flex;
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+
+  .app-meta span + span::before {
+    content: '·';
+    margin-right: var(--space-sm);
+  }
+</style>

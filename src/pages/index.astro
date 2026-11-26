@@ -1,102 +1,205 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import RepoCard from '../components/RepoCard.astro';
+import AppTile from '../components/AppTile.astro';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('projects'))
   .sort((a, b) => a.data.order - b.data.order);
-const inSection = (section: string) => projects.filter((p) => p.data.section === section);
+const products = projects.filter((p) => p.data.section === 'venture');
+const apps = projects.filter((p) => p.data.section === 'app');
 
-const ventures = inSection('venture');
-const openSource = inSection('open-source');
-const hackathonBuilds = inSection('hackathon');
+const byNewest = (a: { data: { date: Date } }, b: { data: { date: Date } }) =>
+  b.data.date.valueOf() - a.data.date.valueOf();
+const hackathons = (await getCollection('hackathons')).sort(byNewest);
+const talks = (await getCollection('talks')).sort(byNewest);
 
-const talks = (await getCollection('talks'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const monthYear = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 
-const hackathons = (await getCollection('hackathons'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const TABS = [
+  { id: 'products', label: 'Products' },
+  { id: 'apps', label: 'Apps' },
+  { id: 'hackathons', label: 'Hackathons' },
+  { id: 'talks', label: 'Talks' },
+];
 ---
 
 <BaseLayout title="Giorgi Tarsaidze">
 
-  <!-- Ventures -->
-  <section class="section">
-    <h2 class="section-title">Ventures</h2>
+  <nav class="tabs" role="tablist" aria-label="Portfolio">
+    {TABS.map((t, i) => (
+      <button
+        type="button"
+        role="tab"
+        id={`tab-${t.id}`}
+        aria-controls={`panel-${t.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        data-tab={t.id}
+      >{t.label}</button>
+    ))}
+  </nav>
+
+  <section class="tab-panel" role="tabpanel" id="panel-products" aria-labelledby="tab-products">
     <div class="card-grid">
-      {ventures.map((p) => <ProjectCard project={p} />)}
+      {products.map((p) => <ProjectCard project={p} />)}
     </div>
   </section>
 
-  <!-- Open source -->
-  <section class="section">
-    <h2 class="section-title">Open source</h2>
-    <div class="card-grid card-grid-3">
-      {openSource.map((p) => <RepoCard project={p} />)}
+  <section class="tab-panel" role="tabpanel" id="panel-apps" aria-labelledby="tab-apps" hidden>
+    <div class="apps">
+      {apps.map((a) => <AppTile app={a} />)}
     </div>
   </section>
 
-  <!-- Hackathon builds -->
-  <section class="section">
-    <h2 class="section-title">Hackathon builds</h2>
-    <ul class="project-list">
-      {hackathonBuilds.map((project) => (
-        <li class="project-item">
-          <a class="project-name" href={project.data.link} target="_blank" rel="noopener noreferrer">
-            {project.data.title}
-          </a>
-          <p class="project-description">{project.data.description}</p>
+  <section class="tab-panel" role="tabpanel" id="panel-hackathons" aria-labelledby="tab-hackathons" hidden>
+    <ul class="timeline">
+      {hackathons.map((h) => (
+        <li>
+          <time>{monthYear(h.data.date)}</time>
+          <div>
+            {h.data.link
+              ? <a class="timeline-title" href={h.data.link} target="_blank" rel="noopener noreferrer">{h.data.title}</a>
+              : <span class="timeline-title">{h.data.title}</span>}
+            {h.data.description && <p>{h.data.description}</p>}
+            {h.data.event && <p class="timeline-meta">{h.data.event}</p>}
+          </div>
         </li>
       ))}
     </ul>
   </section>
 
-  <!-- Talks & Hackathons — two-column row -->
-  <div class="two-column-row">
-    <section class="section">
-      <h2 class="section-title">Talks</h2>
-      {talks.length === 0 ? (
-        <p style="color: var(--color-text-secondary)">No talks yet.</p>
-      ) : (
-        <ul class="simple-list">
-          {talks.map((talk) => (
-            <li>
-              <strong>
-                {talk.data.link ? (
-                  <a href={talk.data.link} target="_blank" rel="noopener noreferrer">{talk.data.title}</a>
-                ) : (
-                  talk.data.title
-                )}
-              </strong>
-              <span class="list-meta">{talk.data.event} &middot; {talk.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+  <section class="tab-panel" role="tabpanel" id="panel-talks" aria-labelledby="tab-talks" hidden>
+    <ul class="timeline">
+      {talks.map((t) => (
+        <li>
+          <time>{monthYear(t.data.date)}</time>
+          <div>
+            {t.data.link
+              ? <a class="timeline-title" href={t.data.link} target="_blank" rel="noopener noreferrer">{t.data.title}</a>
+              : <span class="timeline-title">{t.data.title}</span>}
+            {t.data.event && <p class="timeline-meta">{t.data.event}</p>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
 
-    <section class="section">
-      <h2 class="section-title">Hackathons & Events</h2>
-      {hackathons.length === 0 ? (
-        <p style="color: var(--color-text-secondary)">No events yet.</p>
-      ) : (
-        <ul class="simple-list">
-          {hackathons.map((hack) => (
-            <li>
-              <strong>
-                {hack.data.link ? (
-                  <a href={hack.data.link} target="_blank" rel="noopener noreferrer">{hack.data.title}</a>
-                ) : (
-                  hack.data.title
-                )}
-              </strong>
-              <span class="list-meta">{hack.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} &middot; {hack.data.description}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  </div>
+  <script is:inline>
+    (function () {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      function show(id, push) {
+        const tab = tabs.find((t) => t.dataset.tab === id) || tabs[0];
+        tabs.forEach((t) => {
+          const on = t === tab;
+          t.setAttribute('aria-selected', on);
+          t.tabIndex = on ? 0 : -1;
+          document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        });
+        if (push) history.replaceState(null, '', location.search + '#' + tab.dataset.tab);
+      }
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => show(t.dataset.tab, true));
+        t.addEventListener('keydown', (e) => {
+          const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (!step) return;
+          const next = tabs[(i + step + tabs.length) % tabs.length];
+          next.focus();
+          show(next.dataset.tab, true);
+        });
+      });
+      show(location.hash.slice(1), false);
+      window.addEventListener('hashchange', () => show(location.hash.slice(1), false));
+    })();
+  </script>
 
 </BaseLayout>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tabs button {
+    padding: 0 0 var(--space-sm);
+    margin-bottom: -1px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font: inherit;
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .tabs button:hover {
+    color: var(--color-text);
+  }
+
+  .tabs button[aria-selected='true'] {
+    color: var(--color-text);
+    font-weight: 700;
+    border-bottom-color: var(--color-accent);
+  }
+
+  .tab-panel {
+    margin-bottom: var(--space-xl);
+  }
+
+  .apps {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-xl) var(--space-md);
+    padding-top: var(--space-md);
+  }
+
+  .timeline {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timeline li {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .timeline time {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    padding-top: 0.15rem;
+  }
+
+  .timeline-title {
+    font-weight: 700;
+  }
+
+  .timeline p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+
+  .timeline .timeline-meta {
+    font-size: 0.8rem;
+    margin-top: 0.15rem;
+  }
+
+  @media (max-width: 640px) {
+    .tabs {
+      gap: var(--space-md);
+    }
+
+    .timeline li {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
+</style>

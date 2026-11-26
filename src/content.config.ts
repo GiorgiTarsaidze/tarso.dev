@@ -19,7 +19,7 @@ const projects = defineCollection({
     link: z.string().url(),
     description: z.string(),
     order: z.number(),
-    section: z.enum(['venture', 'open-source', 'hackathon']),
+    section: z.enum(['venture', 'app']),
     featured: z.boolean().default(false),
     role: z.string().optional(),
     status: z.string().optional(),
@@ -44,7 +44,8 @@ const hackathons = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    description: z.string(),
+    description: z.string().optional(),
+    event: z.string().optional(),
     link: z.string().url().optional(),
   }),
 });

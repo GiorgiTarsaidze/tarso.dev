@@ -18,6 +18,8 @@ Astro 6 static site with MDX support, deployed to Cloudflare Pages. Single-page 
 
 **Content collections** (defined in `src/content.config.ts`): `blog` (`.mdx`/`.md`), `projects`, `talks`, `hackathons`. All use glob loaders pointing to `src/content/<collection>/`. Blog posts with `draft: true` are filtered out at query time.
 
+**Homepage tabs:** Products (`projects` with `section: venture`, rendered by `ProjectCard`), Apps (`section: app`, rendered by `AppTile`; each app's icon is `public/apps/<id>.svg` and its GitHub stars come from `repo` at build time), Hackathons and Talks (dated lists). Each tab is linkable by hash, e.g. `/#apps`.
+
 **Site config** (`src/config.ts`): Exports `SITE`, `SOCIAL`, `READING_FONTS`, `FONT_SIZES`, `LINE_HEIGHTS`. Reading experience settings (fonts, sizes, line heights) are configured here — follow the instructions in the file comments when adding new fonts.
 
 **MDX components:** Custom components for MDX are mapped in `src/pages/blog/[slug].astro` via the `components` object passed to `<Content>`.
